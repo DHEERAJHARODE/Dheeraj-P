@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -8,12 +8,33 @@ import { Menu, X } from "lucide-react";
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    // ✅ Scroll pe close
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+      if (menuOpen) setMenuOpen(false);
+    };
+
+    // ✅ Outside click pe close
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    };
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuOpen]);
 
   const navLinks = [
     { name: "Home", href: "#" },
@@ -64,46 +85,46 @@ export default function Navbar() {
         </button>
       </div>
 
-    {/* ✅ Mobile Sidebar */}
-    <AnimatePresence>
-      {menuOpen && (
-        <motion.div
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "100%" }}
-          transition={{ type: "spring", stiffness: 80 }}
-          className="fixed top-0 right-0 h-full w-2/3 
-                    bg-black/60 backdrop-blur-lg shadow-lg 
-                    z-40 md:hidden flex flex-col text-white"
-        >
-          {/* ✅ Close Button (Top-Left) */}
-          <div className="p-6">
-            <button
-              onClick={() => setMenuOpen(false)}
-              className="text-white hover:text-yellow-300 transition"
-            >
-              <X size={28} />
-            </button>
-          </div>
-
-          {/* ✅ Links - Center with hover underline */}
-          <div className="flex flex-col items-center space-y-6 mt-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="relative text-lg font-semibold group"
+      {/* ✅ Mobile Sidebar */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            ref={sidebarRef}
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", stiffness: 80 }}
+            className="fixed top-0 right-0 h-full w-2/3 
+                      bg-black/60 backdrop-blur-lg shadow-lg 
+                      z-40 md:hidden flex flex-col text-white"
+          >
+            {/* ✅ Close Button (Top-Left) */}
+            <div className="p-6">
+              <button
                 onClick={() => setMenuOpen(false)}
+                className="text-white hover:text-yellow-300 transition"
               >
-                {link.name}
-                <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-yellow-300 transition-all group-hover:w-full"></span>
-              </Link>
-            ))}
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+                <X size={28} />
+              </button>
+            </div>
 
+            {/* ✅ Links */}
+            <div className="flex flex-col items-center space-y-6 mt-8">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="relative text-lg font-semibold group"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {link.name}
+                  <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-yellow-300 transition-all group-hover:w-full"></span>
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }
