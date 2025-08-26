@@ -10,6 +10,7 @@ const projects = [
   { id: 4, title: "SaaS Dashboard", category: "Web", video: "/videos/dashboard.mp4", link: "https://example.com/dashboard" },
   { id: 5, title: "Learning Platform", category: "Web", video: "/videos/learning.mp4", link: "https://example.com/learning" },
   { id: 6, title: "Booking Website", category: "Web", video: "/videos/booking.mp4", link: "https://example.com/booking" },
+  { id: 11, title: "Scale Tribe - Digital Marketing Website", category: "Web", video: "/videos/scale-tribe.mp4", link: "https://dheerajharode.github.io/Agency/"},
 
   // --- Mobile Projects ---
   { id: 7, title: "Fitness Tracker App", category: "Mobile", video: "/videos/fitness.mp4", link: "https://example.com/fitness" },
